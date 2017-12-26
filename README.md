@@ -3,6 +3,7 @@
 converter/data/VGG_ILSVRC_16_layers.caffemodel
 
 converter/data/VGG_ILSVRC_16_layers_deploy.prototxt
+
 を準備
 
 
