@@ -46,3 +46,6 @@ $ python show_model.py
 
 dest_pathで出力先を指定
 
+
+
+show.py　…　weightファイルを出力するなどの関数
