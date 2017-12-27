@@ -53,13 +53,19 @@ class VGG {
         let inputImage = MPSNNImageNode(handle: nil)
         
         
-        let scale = MPSNNLanczosScaleNode(source: inputImage,
-                                          outputSize: MTLSize(width: VGG.inputWidth,
-                                                              height: VGG.inputHeight,
-                                                              depth: 3))
+        let scale = MPSNNBilinearScaleNode(source: inputImage,
+                                           outputSize: MTLSize(width: VGG.inputWidth,
+                                                               height: VGG.inputHeight,
+                                                               depth: 3))
+        
+        
+//        let scale = MPSNNLanczosScaleNode(source: inputImage,
+//                                          outputSize: MTLSize(width: VGG.inputWidth,
+//                                                              height: VGG.inputHeight,
+//                                                              depth: 3))
         
         let mean = MPSCNNConvolutionNode(source: scale.resultImage,
-                                          weights: DataSource("conv0", 1, 1, 3, 3, useLeaky: false))
+                                         weights: DataSource("conv0", 1, 1, 3, 3, useReLU: false))
         
         let conv1 = MPSCNNConvolutionNode(source: mean.resultImage,
                                           weights: DataSource("conv1", 3, 3, 3, 64))
@@ -119,7 +125,7 @@ class VGG {
                                            weights: DataSource("fc2", 1, 1, 4096, 4096))
         
         let fc3 = MPSCNNFullyConnectedNode(source: fc2.resultImage,
-                                           weights: DataSource("fc3", 1, 1, 4096, 1000, useLeaky: false))
+                                           weights: DataSource("fc3", 1, 1, 4096, 1000))
      
         let softmax = MPSCNNSoftMaxNode(source: fc3.resultImage)
         
@@ -187,7 +193,7 @@ class VGG {
         let kernelHeight: Int
         let inputFeatureChannels: Int
         let outputFeatureChannels: Int
-        let useLeaky: Bool
+        let useReLU: Bool
         
         var data: Data?
         var data_w: Data?
@@ -196,13 +202,13 @@ class VGG {
         
         init(_ name: String, _ kernelWidth: Int, _ kernelHeight: Int,
              _ inputFeatureChannels: Int, _ outputFeatureChannels: Int,
-             useLeaky: Bool = true) {
+             useReLU: Bool = true) {
             self.name = name
             self.kernelWidth = kernelWidth
             self.kernelHeight = kernelHeight
             self.inputFeatureChannels = inputFeatureChannels
             self.outputFeatureChannels = outputFeatureChannels
-            self.useLeaky = useLeaky
+            self.useReLU = useReLU
         }
         
         func descriptor() -> MPSCNNConvolutionDescriptor {
@@ -210,7 +216,7 @@ class VGG {
                                                    kernelHeight: kernelHeight,
                                                    inputFeatureChannels: inputFeatureChannels,
                                                    outputFeatureChannels: outputFeatureChannels)
-            if useLeaky {
+            if useReLU {
                 desc.setNeuronType(.reLU, parameterA: 0, parameterB: 0)
                 
                 

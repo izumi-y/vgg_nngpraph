@@ -147,7 +147,7 @@ class ViewController: UIViewController {
 extension ViewController: VideoCaptureDelegate {
     func videoCapture(_ capture: VideoCapture, didCaptureVideoTexture texture: MTLTexture?, timestamp: CMTime) {
         // For debugging.
-        predict(texture: loadTexture(named: "dog.jpg")!); return
+//        predict(texture: loadTexture(named: "dog.jpg")!); return
         
         // The semaphore is necessary because the call to predict() does not block.
         // If we _would_ be blocking, then AVCapture will automatically drop frames
@@ -158,9 +158,9 @@ extension ViewController: VideoCaptureDelegate {
         // done. Any new frames that come in during that time will simply be dropped.
         semaphore.wait()
         
-//        if let texture = texture {
-//            predict(texture: texture)
-//        }
+        if let texture = texture {
+            predict(texture: texture)
+        }
     }
 }
 
